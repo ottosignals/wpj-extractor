@@ -5,6 +5,17 @@ from .queries import orders
 class WPJApiError(Exception):
     pass
 
+def convert_to_graphql_object(d):
+    items = []
+    for key, value in d.items():
+        if isinstance(value, dict):
+            # If the value is a nested dictionary, recursively convert it
+            nested_object = convert_to_graphql_object(value)
+            items.append(f"{key}: {nested_object}")
+        else:
+            items.append(f'{key}: "{value}"')
+    return "{" + ", ".join(items) + "}"
+
 class WPJApi():
   def __init__(self, domain, api_key):
     self._domain = domain
@@ -27,13 +38,8 @@ class WPJApi():
     orders_json = response.json().get("data",{}).get("orders",{})
     return orders_json
   
-  def get_orders_pagination(self, limit=100, filter=None):
-    params = {"offset": 0, 'limit': limit, 'sort': '{dateCreated: ASC}', 'filter': '{}'}
-    if filter:
-      params["filter"] = """{{
-        dateFrom: "{dateFrom}",
-        dateTo: "{dateTo}"
-      }}""".format(**filter)
+  def get_orders_pagination(self, limit=100, filter={}):
+    params = {"offset": 0, 'limit': limit, 'sort': '{dateCreated: ASC}', 'filter': convert_to_graphql_object(filter)}
 
     data = []
     while True:

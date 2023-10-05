@@ -12,27 +12,36 @@ def run():
 
   API_KEY = os.getenv("API_KEY")
   API_DOMAIN = os.getenv("API_DOMAIN")
-  API_METHOD = os.getenv("API_METHOD", 'orders')
+  API_METHOD = os.getenv("API_METHOD")
   
   params = {
     "dateFrom": os.environ.get('date_from'),
     "dateTo": os.environ.get('date_to'),
-    "numOfDays": int(os.environ.get('num_of_days', 1))
+    "numOfDays": int(os.environ.get('num_of_days', 3)),
+    "numOfDaysUpdated": int(os.environ.get('num_of_days_updated', 0))
   }
 
+  filter = {}
+
   if params["dateFrom"]:
-    params["dateFrom"] = datetime.datetime.strptime(params["dateFrom"], '%Y-%m-%d').isoformat(sep=' ')
-    params["dateTo"] = datetime.datetime.strptime(params["dateTo"], '%Y-%m-%d').isoformat(sep=' ')
+    filter["dateFrom"] = datetime.datetime.strptime(params["dateFrom"], '%Y-%m-%d').isoformat(sep=' ')
+    filter["dateTo"] = datetime.datetime.strptime(params["dateTo"], '%Y-%m-%d').isoformat(sep=' ')
+  elif params["numOfDaysUpdated"] > 0:
+    filter["dateUpdated"] = {}
+    filter["dateUpdated"]["ge"] = datetime.datetime.now() - datetime.timedelta(days=params["numOfDaysUpdated"])
+    filter["dateUpdated"]["ge"] =  filter["dateUpdated"]["ge"].replace(hour=0, minute=0, second=0, microsecond=0).isoformat(sep=' ')
+    filter["dateUpdated"]["le"] = datetime.datetime.now() 
+    filter["dateUpdated"]["le"] =  filter["dateUpdated"]["le"].replace(hour=0, minute=0, second=0, microsecond=0).isoformat(sep=' ')
   else:
-    params["dateFrom"] = datetime.datetime.now() - datetime.timedelta(days=params["numOfDays"])
-    params["dateFrom"] = params["dateFrom"].replace(hour=0, minute=0, second=0, microsecond=0).isoformat(sep=' ')
-    params["dateTo"] = datetime.datetime.now() 
-    params["dateTo"] = params["dateTo"].replace(hour=0, minute=0, second=0, microsecond=0).isoformat(sep=' ')
+    filter["dateFrom"] = datetime.datetime.now() - datetime.timedelta(days=params["numOfDays"])
+    filter["dateFrom"] = filter["dateFrom"].replace(hour=0, minute=0, second=0, microsecond=0).isoformat(sep=' ')
+    filter["dateTo"] = datetime.datetime.now() 
+    filter["dateTo"] = filter["dateTo"].replace(hour=0, minute=0, second=0, microsecond=0).isoformat(sep=' ')
 
   api = WPJApi(API_DOMAIN, API_KEY)
   bq = BigQueryApi()
   if API_METHOD == 'orders':
-    rows = api.get_orders_pagination(limit=100, filter=params)
+    rows = api.get_orders_pagination(limit=100, filter=filter)
     bq.insert(PROJECT_ID, DATASET_ID, TABLE_ID, rows, schema=orders_bq_schema)
 
 

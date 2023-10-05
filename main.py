@@ -1,10 +1,13 @@
 import requests
 import pandas as pd
-import json 
 import os
 from google.cloud import bigquery
 import models.orders
 import datetime
+from decorators.retry import retry
+
+class WPJApiError(Exception):
+    pass
 
 class WPJApi():
   def __init__(self, domain, api_key):
@@ -14,12 +17,12 @@ class WPJApi():
       "X-Access-Token": f"{api_key}"
     }
   
+  @retry(tries=3, delay=10, max_delay=60, backoff=2)
   def send_request(self, body):
-    #TODO: retry
     response = requests.get(url=self._url_base, json={"query": body}, headers=self._headers)
     print("response status code: ", response.status_code)
     if response.status_code != 200:
-      print("response : ", response.content)
+      raise WPJApiError(f"WPJ Api Error with status code: {response.status_code}")
     return response
 
   def get_orders(self, params):

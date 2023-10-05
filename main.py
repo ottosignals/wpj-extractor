@@ -18,6 +18,9 @@ def run():
     "dateFrom": os.environ.get('date_from'),
     "dateTo": os.environ.get('date_to'),
     "numOfDays": int(os.environ.get('num_of_days', 3)),
+    
+    "dateFromUpdated": os.environ.get('date_from_updated'),
+    "dateToUpdated": os.environ.get('date_to_updated'),
     "numOfDaysUpdated": int(os.environ.get('num_of_days_updated', 0))
   }
 
@@ -26,6 +29,10 @@ def run():
   if params["dateFrom"]:
     filter["dateFrom"] = datetime.datetime.strptime(params["dateFrom"], '%Y-%m-%d').isoformat(sep=' ')
     filter["dateTo"] = datetime.datetime.strptime(params["dateTo"], '%Y-%m-%d').isoformat(sep=' ')
+  elif params["dateFromUpdated"]:
+    filter["dateUpdated"] = {}
+    filter["dateUpdated"]["ge"] = datetime.datetime.strptime(params["dateFromUpdated"], '%Y-%m-%d').isoformat(sep=' ')
+    filter["dateUpdated"]["le"] = datetime.datetime.strptime(params["dateToUpdated"], '%Y-%m-%d').isoformat(sep=' ')
   elif params["numOfDaysUpdated"] > 0:
     filter["dateUpdated"] = {}
     filter["dateUpdated"]["ge"] = datetime.datetime.now() - datetime.timedelta(days=params["numOfDaysUpdated"])

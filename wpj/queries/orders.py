@@ -1,4 +1,4 @@
-query = """
+gql_query = """
     query orders{{
   orders(
   offset: {offset},
@@ -152,8 +152,7 @@ query = """
 
     """
 
-
-schema = [
+bq_schema = [
   {"name": "id", "type": "INTEGER"},
   {"name": "source", "type": "RECORD", "mode": "NULLABLE",
     "fields": [

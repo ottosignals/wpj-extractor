@@ -6,12 +6,14 @@ class WPJApiError(Exception):
     pass
 
 def convert_to_graphql_object(d):
+    if isinstance(d, str):
+       return d
     items = []
     for key, value in d.items():
         if isinstance(value, dict):
             # If the value is a nested dictionary, recursively convert it
             nested_object = convert_to_graphql_object(value)
-            items.append(f"{key}: {nested_object}")
+            items.append(f'{key}: {nested_object}')
         else:
             items.append(f'{key}: "{value}"')
     return "{" + ", ".join(items) + "}"
@@ -46,36 +48,16 @@ class WPJApi():
     data_json = response.json().get("data", {}).get(method, {})
     return data_json
   
-  def get_orders_pagination(self, limit=100, filter={}):
-    params = {"offset": 0, 'limit': limit, 'sort': '{dateCreated: ASC}', 'filter': convert_to_graphql_object(filter)}
-
+  def get_query_pagination(self, method, limit, sort={}, filter={}):
+    params = {"offset": 0, 'limit': limit, 'sort': convert_to_graphql_object(sort), 'filter': convert_to_graphql_object(filter)}
+    
     data = []
     while True:
-      response = self.get_query('orders', params)
+      response = self.get_query(method, params)
       print(response)
       items = response.get('items', [])
       data.extend(items)
       print(f'Offset: {params["offset"]}, size: {len(items)}, hasNextPage: {response.get("hasNextPage", False)}')
-
-      if response.get("hasNextPage", False) != True:
-        break
-
-      params["offset"] += len(items)
-    return data
-  
-
-  
-  def get_products_pagination(self, limit=100, filter={}):
-    params = {"offset": 0, 'limit': limit, 'sort': '{id: ASC}', 'filter': convert_to_graphql_object(filter)}
-
-    data = []
-    while True:
-      response = self.get_query('orders', params)
-      print(response)
-      items = response.get('items', [])
-      data.extend(items)
-      print(f'Offset: {params["offset"]}, size: {len(items)}, hasNextPage: {response.get("hasNextPage", False)}')
-
       if response.get("hasNextPage", False) != True:
         break
 

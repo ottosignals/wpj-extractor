@@ -1,6 +1,6 @@
 import requests
 from .decorators.retry import retry
-from .queries import orders
+from .queries import orders, products
 
 class WPJApiError(Exception):
     pass
@@ -32,18 +32,45 @@ class WPJApi():
       raise WPJApiError(f"WPJ Api Error with status code: {response.status_code}")
     return response
 
-  def get_orders(self, params):
-    body = orders.gql_query.format(**params)
+  def get_query(self, method, params):
+    gql_query = {
+        "orders": orders.gql_query,
+        "products": products.gql_query,
+    }.get(method)
+
+    if gql_query is None:
+        raise WPJApiError(f"Invalid method specified: {method}")
+
+    body = gql_query.format(**params)
     response = self.send_request(body)
-    orders_json = response.json().get("data",{}).get("orders",{})
-    return orders_json
+    data_json = response.json().get("data", {}).get(method, {})
+    return data_json
   
   def get_orders_pagination(self, limit=100, filter={}):
     params = {"offset": 0, 'limit': limit, 'sort': '{dateCreated: ASC}', 'filter': convert_to_graphql_object(filter)}
 
     data = []
     while True:
-      response = self.get_orders(params)
+      response = self.get_query('orders', params)
+      print(response)
+      items = response.get('items', [])
+      data.extend(items)
+      print(f'Offset: {params["offset"]}, size: {len(items)}, hasNextPage: {response.get("hasNextPage", False)}')
+
+      if response.get("hasNextPage", False) != True:
+        break
+
+      params["offset"] += len(items)
+    return data
+  
+
+  
+  def get_products_pagination(self, limit=100, filter={}):
+    params = {"offset": 0, 'limit': limit, 'sort': '{id: ASC}', 'filter': convert_to_graphql_object(filter)}
+
+    data = []
+    while True:
+      response = self.get_query('orders', params)
       print(response)
       items = response.get('items', [])
       data.extend(items)

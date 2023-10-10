@@ -42,6 +42,7 @@ def run():
   api = WPJApi(API_DOMAIN, API_KEY)
   bq = BigQueryApi()
   schema = None
+  rows = []
   
   print(f"Downloading data from '{API_DOMAIN}' with method '{API_METHOD}' and filter '{filter}'")
   if API_METHOD == 'orders':

@@ -54,7 +54,6 @@ class WPJApi():
     data = []
     while True:
       response = self.get_query(method, params)
-      print(response)
       items = response.get('items', [])
       data.extend(items)
       print(f'Offset: {params["offset"]}, size: {len(items)}, hasNextPage: {response.get("hasNextPage", False)}')

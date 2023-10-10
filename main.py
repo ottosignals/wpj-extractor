@@ -17,33 +17,27 @@ def run():
   params = {
     "dateFrom": os.environ.get('date_from'),
     "dateTo": os.environ.get('date_to'),
-    "numOfDays": int(os.environ.get('num_of_days', 3)),
+    "numOfDays": int(os.environ.get('num_of_days', 0)),
     
-    "dateFromUpdated": os.environ.get('date_from_updated'),
-    "dateToUpdated": os.environ.get('date_to_updated'),
     "numOfDaysUpdated": int(os.environ.get('num_of_days_updated', 0))
   }
 
   filter = {}
 
-  if params["dateFrom"]:
-    filter["dateFrom"] = datetime.datetime.strptime(params["dateFrom"], '%Y-%m-%d').isoformat(sep=' ')
-    filter["dateTo"] = datetime.datetime.strptime(params["dateTo"], '%Y-%m-%d').isoformat(sep=' ')
-  elif params["dateFromUpdated"]:
-    filter["dateUpdated"] = {}
-    filter["dateUpdated"]["ge"] = datetime.datetime.strptime(params["dateFromUpdated"], '%Y-%m-%d').isoformat(sep=' ')
-    filter["dateUpdated"]["le"] = datetime.datetime.strptime(params["dateToUpdated"], '%Y-%m-%d').isoformat(sep=' ')
-  elif params["numOfDaysUpdated"] > 0:
+  if params["numOfDaysUpdated"] > 0:
     filter["dateUpdated"] = {}
     filter["dateUpdated"]["ge"] = datetime.datetime.now() - datetime.timedelta(days=params["numOfDaysUpdated"])
     filter["dateUpdated"]["ge"] =  filter["dateUpdated"]["ge"].replace(hour=0, minute=0, second=0, microsecond=0).isoformat(sep=' ')
     filter["dateUpdated"]["le"] = datetime.datetime.now() 
     filter["dateUpdated"]["le"] =  filter["dateUpdated"]["le"].replace(hour=0, minute=0, second=0, microsecond=0).isoformat(sep=' ')
-  else:
+  elif params["numOfDays"] > 0:
     filter["dateFrom"] = datetime.datetime.now() - datetime.timedelta(days=params["numOfDays"])
     filter["dateFrom"] = filter["dateFrom"].replace(hour=0, minute=0, second=0, microsecond=0).isoformat(sep=' ')
     filter["dateTo"] = datetime.datetime.now() 
     filter["dateTo"] = filter["dateTo"].replace(hour=0, minute=0, second=0, microsecond=0).isoformat(sep=' ')
+  elif params["dateFrom"]:
+    filter["dateFrom"] = datetime.datetime.strptime(params["dateFrom"], '%Y-%m-%d').isoformat(sep=' ')
+    filter["dateTo"] = datetime.datetime.strptime(params["dateTo"], '%Y-%m-%d').isoformat(sep=' ') 
 
   api = WPJApi(API_DOMAIN, API_KEY)
   bq = BigQueryApi()

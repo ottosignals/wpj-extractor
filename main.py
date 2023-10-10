@@ -41,11 +41,19 @@ def run():
 
   api = WPJApi(API_DOMAIN, API_KEY)
   bq = BigQueryApi()
+  schema = None
+  
+  print(f"Downloading data from '{API_DOMAIN}' with method '{API_METHOD}' and filter '{filter}'")
   if API_METHOD == 'orders':
     rows = api.get_query_pagination(API_METHOD, limit=100, sort='{dateCreated: ASC}', filter=filter)
-    bq.insert(PROJECT_ID, DATASET_ID, TABLE_ID, rows, schema=orders_bq_schema)
   elif API_METHOD == 'products':
     rows = api.get_query_pagination(API_METHOD, limit=100, sort='{id: ASC}')
+
+  print(f"Downloaded '{len(rows)}' rows of data")
+  if rows:
+    print(f"Inserting downloaded data to BigQuery")
+    bq.insert(PROJECT_ID, DATASET_ID, TABLE_ID, rows, schema=orders_bq_schema)
+    print(f"Data has been inserted to BigQuery")
 
 
 run()

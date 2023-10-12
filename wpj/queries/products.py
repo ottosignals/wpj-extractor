@@ -94,7 +94,6 @@ query Products {{
 """
 
 bq_schema = [
-  {"name": "_created_timestamp", "type": "TIMESTAMP", "defaultValueExpression": "CURRENT_TIMESTAMP()"},
   {"name": "id", "type": "INTEGER"},
   {"name": "variationId", "type": "INTEGER"},
   {"name": "url", "type": "STRING"},

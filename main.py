@@ -4,6 +4,7 @@ import datetime
 from bigquery.api import BigQueryApi
 from wpj.api import WPJApi
 from wpj.queries.orders import bq_schema as orders_bq_schema
+from wpj.queries.products import bq_schema as products_bq_schema
 
 def run():
   PROJECT_ID = os.environ.get('PROJECT_ID')
@@ -50,12 +51,12 @@ def run():
     schema = orders_bq_schema
   elif API_METHOD == 'products':
     rows = api.get_query_pagination(API_METHOD, limit=100, sort='{id: ASC}')
+    schema = products_bq_schema
 
   print(f"Downloaded '{len(rows)}' rows of data")
-  if rows:
-    print(f"Inserting downloaded data to BigQuery")
-    bq.insert(PROJECT_ID, DATASET_ID, TABLE_ID, rows, schema=schema)
-    print(f"Data has been inserted to BigQuery")
+  print(f"Inserting downloaded data to BigQuery")
+  bq.insert(PROJECT_ID, DATASET_ID, TABLE_ID, rows, schema=schema)
+  print(f"Data has been inserted to BigQuery")
 
 
 run()

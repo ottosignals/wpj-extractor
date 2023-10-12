@@ -1,4 +1,5 @@
 from google.cloud import bigquery
+from google.api_core.exceptions import BadRequest
 
 class BigQueryApi():
   def __init__(self):
@@ -22,4 +23,10 @@ class BigQueryApi():
       dataframe, table_id, job_config=job_config
     )
 
-    job.result()  # Wait for the job to complete.
+    try:
+      job.result()
+    except BadRequest as e:
+      for e in job.errors:
+        print(f"BigQuery error: {e['message']}")
+      raise Exception("BigQuery error")
+      

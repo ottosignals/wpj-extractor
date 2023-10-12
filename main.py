@@ -17,11 +17,18 @@ def run():
   
   params = {
     "dateFrom": os.environ.get('date_from'),
-    "dateTo": os.environ.get('date_to'),
-    "numOfDays": int(os.environ.get('num_of_days', 0)),
-    
-    "numOfDaysUpdated": int(os.environ.get('num_of_days_updated', 3))
+    "dateTo": os.environ.get('date_to')
   }
+
+  try:
+    params['numOfDays'] = int(os.environ.get('num_of_days', 0))
+  except ValueError:
+    params['numOfDays'] = 0
+
+  try:
+    params['numOfDaysUpdated'] = int(os.environ.get('num_of_days_updated', 3))
+  except ValueError:
+    params['numOfDaysUpdated'] = 3
 
   filter = {}
   if params["dateFrom"]:

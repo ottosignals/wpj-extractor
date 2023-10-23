@@ -85,6 +85,15 @@ query Products {{
                 ean
                 title
                 inStore
+                stores {{
+                  inStore
+                    store {{
+                      id
+                      name
+                      type
+                      visible
+                  }}
+                }}   
                 visible
                 weight
             }}
@@ -145,7 +154,7 @@ bq_schema = [
         "type": "RECORD",
         "fields": [
           {"name": "code", "type": "STRING"},
-          {"name": "rate", "type": "NUMERIC"},
+          {"name": "rate", "type": "NUMERIC"}
         ]
       }
     ]
@@ -218,6 +227,24 @@ bq_schema = [
       {"name": "ean", "type": "STRING"},
       {"name": "title", "type": "STRING"},
       {"name": "inStore", "type": "NUMERIC"},
+      {
+        "name": "stores",
+        "type": "RECORD",
+        "mode": "REPEATED",
+        "fields": [
+          {"name": "inStore", "type": "NUMERIC"},
+          {
+            "name": "store",
+            "type": "RECORD",
+            "fields": [
+              {"name": "id", "type": "INTEGER"},
+              {"name": "name", "type": "STRING"},
+              {"name": "type", "type": "STRING"},
+              {"name": "visible", "type": "BOOL"}
+            ]
+          }
+        ]
+      },
       {"name": "visible", "type": "BOOL"},
       {"name": "weight", "type": "NUMERIC"}
     ]

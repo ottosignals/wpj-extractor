@@ -26,7 +26,7 @@ class WPJApi():
       "X-Access-Token": f"{api_key}"
     }
   
-  @retry(tries=3, delay=10, max_delay=60, backoff=2)
+  @retry(tries=4, delay=20, max_delay=60, backoff=2)
   def send_request(self, body):
     response = requests.get(url=self._url_base, json={"query": body}, headers=self._headers)
     print("response status code: ", response.status_code)

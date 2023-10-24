@@ -26,6 +26,11 @@ def run():
     params['numOfDays'] = 0
 
   try:
+    params['numOfDaysCreated'] = int(os.environ.get('num_of_days_created', 0))
+  except ValueError:
+    params['numOfDaysCreated'] = 0
+
+  try:
     params['numOfDaysUpdated'] = int(os.environ.get('num_of_days_updated', 3))
   except ValueError:
     params['numOfDaysUpdated'] = 3
@@ -39,6 +44,12 @@ def run():
     filter["dateFrom"] = filter["dateFrom"].replace(hour=0, minute=0, second=0, microsecond=0).isoformat(sep=' ')
     filter["dateTo"] = datetime.datetime.now() 
     filter["dateTo"] = filter["dateTo"].replace(hour=0, minute=0, second=0, microsecond=0).isoformat(sep=' ')
+  elif params["numOfDaysCreated"] > 0:
+    filter["numOfDaysCreated"] = {}
+    filter["numOfDaysCreated"]["ge"] = datetime.datetime.now() - datetime.timedelta(days=params["numOfDaysUpdated"])
+    filter["numOfDaysCreated"]["ge"] =  filter["numOfDaysCreated"]["ge"].replace(hour=0, minute=0, second=0, microsecond=0).isoformat(sep=' ')
+    filter["numOfDaysCreated"]["le"] = datetime.datetime.now() 
+    filter["numOfDaysCreated"]["le"] =  filter["numOfDaysCreated"]["le"].replace(hour=0, minute=0, second=0, microsecond=0).isoformat(sep=' ')
   elif params["numOfDaysUpdated"] > 0:
     filter["dateUpdated"] = {}
     filter["dateUpdated"]["ge"] = datetime.datetime.now() - datetime.timedelta(days=params["numOfDaysUpdated"])
@@ -52,18 +63,20 @@ def run():
   schema = None
   rows = []
   
-  print(f"Downloading data from '{API_DOMAIN}' with method '{API_METHOD}' and filter '{filter}'")
   if API_METHOD == 'orders':
-    rows = api.get_query_pagination(API_METHOD, limit=100, sort='{dateCreated: ASC}', filter=filter)
+    api.get_query_pagination_init(API_METHOD, limit=100, sort='{dateCreated: ASC}', filter=filter)
     schema = orders_bq_schema
   elif API_METHOD == 'products':
-    rows = api.get_query_pagination(API_METHOD, limit=500, sort='{id: ASC}')
+    api.get_query_pagination_init(API_METHOD, limit=500, sort='{id: ASC}')
     schema = products_bq_schema
-
-  print(f"Downloaded '{len(rows)}' rows of data")
-  print(f"Inserting downloaded data to BigQuery")
-  bq.insert(PROJECT_ID, DATASET_ID, TABLE_ID, rows, schema=schema, batch_size=1000)
-  print(f"Data has been inserted to BigQuery")
+  
+  while api.pagination_end is not True:
+    print(f"Downloading data from '{API_DOMAIN}' with method '{API_METHOD}' and filter '{filter}'")
+    rows = api.get_query_pagination_next()
+    print(f"Downloaded '{len(rows)}' rows of data")
+    print(f"Inserting downloaded data to BigQuery")
+    bq.insert(PROJECT_ID, DATASET_ID, TABLE_ID, rows, schema=schema)
+    print(f"Data has been inserted to BigQuery")
 
 
 run()

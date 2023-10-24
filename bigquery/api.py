@@ -5,7 +5,7 @@ class BigQueryApi():
   def __init__(self):
     self._client = bigquery.Client()
 
-  def insert(self, project, dataset, table, rows, time_partitioning=None, schema=None, batch_size=None):
+  def insert(self, project, dataset, table, rows, time_partitioning=None, schema=None, batch_size=1000000):
     dataset_id = bigquery.Dataset(f"{project}.{dataset}")
     dataset_id.location = 'EU'
     self._client.create_dataset(dataset_id, exists_ok=True)

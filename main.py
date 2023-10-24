@@ -57,7 +57,7 @@ def run():
     rows = api.get_query_pagination(API_METHOD, limit=100, sort='{dateCreated: ASC}', filter=filter)
     schema = orders_bq_schema
   elif API_METHOD == 'products':
-    rows = api.get_query_pagination(API_METHOD, limit=250, sort='{id: ASC}')
+    rows = api.get_query_pagination(API_METHOD, limit=500, sort='{id: ASC}')
     schema = products_bq_schema
 
   print(f"Downloaded '{len(rows)}' rows of data")

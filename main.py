@@ -62,7 +62,7 @@ def run():
 
   print(f"Downloaded '{len(rows)}' rows of data")
   print(f"Inserting downloaded data to BigQuery")
-  bq.insert(PROJECT_ID, DATASET_ID, TABLE_ID, rows, schema=schema, batch_size=10000)
+  bq.insert(PROJECT_ID, DATASET_ID, TABLE_ID, rows, schema=schema, batch_size=1000)
   print(f"Data has been inserted to BigQuery")
 
 

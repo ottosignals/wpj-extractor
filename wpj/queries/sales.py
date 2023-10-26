@@ -125,6 +125,9 @@ query sales {{
                 name
                 product {{
                     id
+                    variationId
+                    code
+                    ean
                 }}
             }}
         }}
@@ -249,7 +252,10 @@ bq_schema = [
         ]},
         {"name": "name", "type": "STRING"},
         {"name": "product", "type": "RECORD", "mode": "NULLABLE", "fields": [
-            {"name": "id", "type": "INTEGER"}
+            {"name": "id", "type": "INTEGER"},
+            {"name": "variationId", "type": "INTEGER"},
+            {"name": "code", "type": "STRING"},
+            {"name": "ean", "type": "STRING"}
         ]}
     ]}
 ]

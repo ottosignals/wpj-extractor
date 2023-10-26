@@ -5,6 +5,7 @@ from bigquery.api import BigQueryApi
 from wpj.api import WPJApi
 from wpj.queries.orders import bq_schema as orders_bq_schema
 from wpj.queries.products import bq_schema as products_bq_schema
+from wpj.queries.sales import bq_schema as sales_bq_schema
 
 def run():
   PROJECT_ID = os.environ.get('PROJECT_ID')
@@ -69,6 +70,9 @@ def run():
   elif API_METHOD == 'products':
     api.get_query_pagination_init(API_METHOD, limit=500, sort='{id: ASC}')
     schema = products_bq_schema
+  elif API_METHOD == 'sales':
+    api.get_query_pagination_init(API_METHOD, limit=100, sort='{dateCreated: ASC}', filter=filter)
+    schema = sales_bq_schema
   
   while api.pagination_end is not True:
     print(f"Downloading data from '{API_DOMAIN}' with method '{API_METHOD}' and filter '{filter}'")

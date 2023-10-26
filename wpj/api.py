@@ -1,6 +1,6 @@
 import requests
 from .decorators.retry import retry
-from .queries import orders, products
+from .queries import orders, products, sales
 
 class WPJApiError(Exception):
     pass
@@ -46,7 +46,8 @@ class WPJApi():
     self._method = method
     self._query = gql_query = {
         "orders": orders.gql_query,
-        "products": products.gql_query
+        "products": products.gql_query,
+        "sales": sales.gql_query
     }.get(method)
     if gql_query is None:
       raise WPJApiError(f"Invalid method specified: {method}")

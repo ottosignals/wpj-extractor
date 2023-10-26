@@ -46,11 +46,11 @@ def run():
     filter["dateTo"] = datetime.datetime.now() 
     filter["dateTo"] = filter["dateTo"].replace(hour=0, minute=0, second=0, microsecond=0).isoformat(sep=' ')
   elif params["numOfDaysCreated"] > 0:
-    filter["numOfDaysCreated"] = {}
-    filter["numOfDaysCreated"]["ge"] = datetime.datetime.now() - datetime.timedelta(days=params["numOfDaysUpdated"])
-    filter["numOfDaysCreated"]["ge"] =  filter["numOfDaysCreated"]["ge"].replace(hour=0, minute=0, second=0, microsecond=0).isoformat(sep=' ')
-    filter["numOfDaysCreated"]["le"] = datetime.datetime.now() 
-    filter["numOfDaysCreated"]["le"] =  filter["numOfDaysCreated"]["le"].replace(hour=0, minute=0, second=0, microsecond=0).isoformat(sep=' ')
+    filter["dateCreated"] = {}
+    filter["dateCreated"]["ge"] = datetime.datetime.now() - datetime.timedelta(days=params["numOfDaysCreated"])
+    filter["dateCreated"]["ge"] =  filter["dateCreated"]["ge"].replace(hour=0, minute=0, second=0, microsecond=0).isoformat(sep=' ')
+    filter["dateCreated"]["le"] = datetime.datetime.now() 
+    filter["dateCreated"]["le"] =  filter["dateCreated"]["le"].replace(hour=0, minute=0, second=0, microsecond=0).isoformat(sep=' ')
   elif params["numOfDaysUpdated"] > 0:
     filter["dateUpdated"] = {}
     filter["dateUpdated"]["ge"] = datetime.datetime.now() - datetime.timedelta(days=params["numOfDaysUpdated"])
@@ -71,7 +71,7 @@ def run():
     api.get_query_pagination_init(API_METHOD, limit=500, sort='{id: ASC}')
     schema = products_bq_schema
   elif API_METHOD == 'sales':
-    api.get_query_pagination_init(API_METHOD, limit=100, sort='{dateCreated: ASC}', filter=filter)
+    api.get_query_pagination_init(API_METHOD, limit=500, sort='{dateCreated: ASC}', filter=filter)
     schema = sales_bq_schema
   
   while api.pagination_end is not True:

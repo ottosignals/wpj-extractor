@@ -99,6 +99,7 @@ query sales {{
                     code
                 }}
             }}
+            data
             items {{
                 id
                 productId
@@ -227,6 +228,7 @@ bq_schema = [
             {"name": "code", "type": "STRING"}
         ]}
     ]},
+    {"name": "data", "type": "STRING"},
     {"name": "items", "type": "RECORD", "mode": "REPEATED", "fields": [
         {"name": "id", "type": "INTEGER"},
         {"name": "productId", "type": "INTEGER"},

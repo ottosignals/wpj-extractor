@@ -1,16 +1,20 @@
 import os
 import datetime
 
-from bigquery.api import BigQueryApi
+from bigquery.api import BigQueryApi, WriteDisposition
 from wpj.api import WPJApi
 from wpj.queries.orders import bq_schema as orders_bq_schema
 from wpj.queries.products import bq_schema as products_bq_schema
 from wpj.queries.sales import bq_schema as sales_bq_schema
+from wpj.queries.users import bq_schema as users_bq_schema
 
 def run():
   PROJECT_ID = os.environ.get('PROJECT_ID')
   DATASET_ID = os.environ.get('DATASET_ID')
   TABLE_ID = os.environ.get('TABLE_ID')
+  TABLE_WRITE_METHOD = os.environ.get("TABLE_WRITE_DISPOSITION", WriteDisposition.WRITE_APPEND)
+  if TABLE_WRITE_METHOD not in WriteDisposition.__dict__.keys():
+    TABLE_WRITE_METHOD = WriteDisposition.WRITE_APPEND
 
   API_KEY = os.getenv("API_KEY")
   API_DOMAIN = os.getenv("API_DOMAIN")
@@ -60,7 +64,7 @@ def run():
 
 
   api = WPJApi(API_DOMAIN, API_KEY)
-  bq = BigQueryApi()
+  bq = BigQueryApi(write_method=TABLE_WRITE_METHOD)
   schema = None
   rows = []
   
@@ -73,6 +77,9 @@ def run():
   elif API_METHOD == 'sales':
     api.get_query_pagination_init(API_METHOD, limit=500, sort='{dateCreated: ASC}', filter=filter)
     schema = sales_bq_schema
+  elif API_METHOD == 'users':
+    api.get_query_pagination_init(API_METHOD, limit=500)
+    schema = users_bq_schema
   
   while api.pagination_end is not True:
     print(f"Downloading data from '{API_DOMAIN}' with method '{API_METHOD}' and filter '{filter}'")

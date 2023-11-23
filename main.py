@@ -12,7 +12,7 @@ def run():
   PROJECT_ID = os.environ.get('PROJECT_ID')
   DATASET_ID = os.environ.get('DATASET_ID')
   TABLE_ID = os.environ.get('TABLE_ID')
-  TABLE_WRITE_METHOD = os.environ.get("TABLE_WRITE_DISPOSITION", WriteDisposition.WRITE_APPEND)
+  TABLE_WRITE_METHOD = os.environ.get("TABLE_WRITE_METHOD", WriteDisposition.WRITE_APPEND)
   if TABLE_WRITE_METHOD not in WriteDisposition.__dict__.keys():
     TABLE_WRITE_METHOD = WriteDisposition.WRITE_APPEND
 
